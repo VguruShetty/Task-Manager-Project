@@ -1,4 +1,3 @@
 # ECommerce-API
 
-new repo created files 
-text content
+new repo created file
