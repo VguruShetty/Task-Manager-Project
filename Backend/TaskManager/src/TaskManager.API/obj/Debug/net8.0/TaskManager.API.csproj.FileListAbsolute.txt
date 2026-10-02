@@ -200,3 +200,4 @@ E:\Project Task Manager\Task-Manager-Project\Backend\TaskManager\src\TaskManager
 E:\Project Task Manager\Task-Manager-Project\Backend\TaskManager\src\TaskManager.API\obj\Debug\net8.0\TaskManager.API.pdb
 E:\Project Task Manager\Task-Manager-Project\Backend\TaskManager\src\TaskManager.API\obj\Debug\net8.0\TaskManager.API.genruntimeconfig.cache
 E:\Project Task Manager\Task-Manager-Project\Backend\TaskManager\src\TaskManager.API\obj\Debug\net8.0\ref\TaskManager.API.dll
+E:\Project Task Manager\Task-Manager-Project\Backend\TaskManager\src\TaskManager.API\bin\Debug\net8.0\Microsoft.AspNetCore.Authentication.JwtBearer.dll

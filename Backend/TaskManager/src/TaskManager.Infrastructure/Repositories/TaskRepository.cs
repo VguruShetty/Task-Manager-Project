@@ -19,9 +19,26 @@ namespace TaskManager.Infrastructure.Repositories
             _context = context;
         }
 
+        //public async Task<IEnumerable<TaskItem>> GetAllAsync(Guid? projectId, TaskItemStatus? status, CancellationToken ct = default)
+        //{
+        //    var query = _context.Tasks
+        //        .Include(t => t.AssignedToUser)
+        //        .Include(t => t.Tags)
+        //        .AsNoTracking()
+        //        .AsQueryable();
+
+        //    if (projectId.HasValue)
+        //        query = query.Where(t => t.ProjectId == projectId.Value);
+
+        //    if (status.HasValue)
+        //        query = query.Where(t => t.Status == status.Value);
+
+        //    return await query.ToListAsync(ct);
+        //}
         public async Task<IEnumerable<TaskItem>> GetAllAsync(Guid? projectId, TaskItemStatus? status, CancellationToken ct = default)
         {
             var query = _context.Tasks
+                .Include(t => t.Project) // Required for OwnerId checking
                 .Include(t => t.AssignedToUser)
                 .Include(t => t.Tags)
                 .AsNoTracking()
@@ -36,9 +53,17 @@ namespace TaskManager.Infrastructure.Repositories
             return await query.ToListAsync(ct);
         }
 
+        //public async Task<TaskItem?> GetByIdAsync(Guid id, CancellationToken ct = default)
+        //{
+        //    return await _context.Tasks
+        //        .Include(t => t.AssignedToUser)
+        //        .Include(t => t.Tags)
+        //        .FirstOrDefaultAsync(t => t.Id == id, ct);
+        //}
         public async Task<TaskItem?> GetByIdAsync(Guid id, CancellationToken ct = default)
         {
             return await _context.Tasks
+                .Include(t => t.Project) // Required for OwnerId checking
                 .Include(t => t.AssignedToUser)
                 .Include(t => t.Tags)
                 .FirstOrDefaultAsync(t => t.Id == id, ct);

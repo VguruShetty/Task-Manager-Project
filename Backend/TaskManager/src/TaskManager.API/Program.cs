@@ -19,7 +19,7 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 
 // Bind JwtSettings strongly-typed options
 builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection(JwtSettings.SectionName));
-
+builder.Services.AddHttpContextAccessor();
 // -------------------------------------------------------------
 // 2. Dependency Injection (Repositories & Services)
 // -------------------------------------------------------------
@@ -27,6 +27,7 @@ builder.Services.AddSingleton<IPasswordHasher, PasswordHasher>();
 builder.Services.AddSingleton<IJwtTokenGenerator, JwtTokenGenerator>();
 
 builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<ICurrentUserService, CurrentUserService>();
 builder.Services.AddScoped<IProjectRepository, ProjectRepository>();
 builder.Services.AddScoped<ITaskRepository, TaskRepository>();
 
