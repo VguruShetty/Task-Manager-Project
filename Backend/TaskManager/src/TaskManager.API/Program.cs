@@ -1,8 +1,11 @@
 using System.Text;
+using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using TaskManager.API.Middleware;
 using TaskManager.Application.Interfaces;
 using TaskManager.Application.Services;
 using TaskManager.Infrastructure;
@@ -20,6 +23,36 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 // Bind JwtSettings strongly-typed options
 builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection(JwtSettings.SectionName));
 builder.Services.AddHttpContextAccessor();
+
+builder.Services.AddApplicationServices();
+builder.Services.AddFluentValidationAutoValidation();
+builder.Services.AddFluentValidationClientsideAdapters();
+builder.Services.Configure<ApiBehaviorOptions>(options =>
+{
+    options.InvalidModelStateResponseFactory = context =>
+    {
+        var errors = context.ModelState
+            .Where(e => e.Value?.Errors.Count > 0)
+            .ToDictionary(
+                kvp => kvp.Key,
+                kvp => kvp.Value!.Errors.Select(e => e.ErrorMessage).ToArray()
+            );
+
+        var problemDetails = new ValidationProblemDetails(context.ModelState)
+        {
+            Type = "https://tools.ietf.org/html/rfc7231#section-6.5.1",
+            Title = "One or more validation errors occurred.",
+            Status = StatusCodes.Status400BadRequest,
+            Instance = context.HttpContext.Request.Path,
+            Detail = "Please refer to the errors property for additional details."
+        };
+
+        return new BadRequestObjectResult(problemDetails)
+        {
+            ContentTypes = { "application/problem+json" }
+        };
+    };
+});
 // -------------------------------------------------------------
 // 2. Dependency Injection (Repositories & Services)
 // -------------------------------------------------------------
@@ -111,6 +144,8 @@ builder.Services.AddSwaggerGen(options =>
 // 5. Middleware Pipeline
 // -------------------------------------------------------------
 var app = builder.Build();
+
+app.UseMiddleware<ExceptionHandlingMiddleware>();
 
 if (app.Environment.IsDevelopment())
 {

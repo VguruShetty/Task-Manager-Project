@@ -1,12 +1,13 @@
 {
   "version": 2,
-  "dgSpecHash": "QsLsAwElx1I=",
+  "dgSpecHash": "XzKOg7mUQFc=",
   "success": true,
   "projectFilePath": "E:\\Project Task Manager\\Task-Manager-Project\\Backend\\TaskManager\\src\\TaskManager.Infrastructure\\TaskManager.Infrastructure.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\Hp\\.nuget\\packages\\azure.core\\1.41.0\\azure.core.1.41.0.nupkg.sha512",
     "C:\\Users\\Hp\\.nuget\\packages\\azure.identity\\1.12.1\\azure.identity.1.12.1.nupkg.sha512",
     "C:\\Users\\Hp\\.nuget\\packages\\bcrypt.net-next\\4.2.0\\bcrypt.net-next.4.2.0.nupkg.sha512",
+    "C:\\Users\\Hp\\.nuget\\packages\\fluentvalidation\\12.1.1\\fluentvalidation.12.1.1.nupkg.sha512",
     "C:\\Users\\Hp\\.nuget\\packages\\humanizer.core\\2.14.1\\humanizer.core.2.14.1.nupkg.sha512",
     "C:\\Users\\Hp\\.nuget\\packages\\microsoft.aspnetcore.http\\2.3.13\\microsoft.aspnetcore.http.2.3.13.nupkg.sha512",
     "C:\\Users\\Hp\\.nuget\\packages\\microsoft.aspnetcore.http.abstractions\\2.3.12\\microsoft.aspnetcore.http.abstractions.2.3.12.nupkg.sha512",
