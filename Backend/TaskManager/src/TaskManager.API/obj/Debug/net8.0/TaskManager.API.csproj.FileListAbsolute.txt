@@ -39,6 +39,14 @@ E:\Project Task Manager\Backend\TaskManager\src\TaskManager.API\obj\Debug\net8.0
 E:\Project Task Manager\Backend\TaskManager\src\TaskManager.API\obj\Debug\net8.0\TaskManager.API.pdb
 E:\Project Task Manager\Backend\TaskManager\src\TaskManager.API\obj\Debug\net8.0\TaskManager.API.genruntimeconfig.cache
 E:\Project Task Manager\Backend\TaskManager\src\TaskManager.API\obj\Debug\net8.0\ref\TaskManager.API.dll
+E:\Project Task Manager\Task-Manager-Project\Backend\TaskManager\src\TaskManager.API\obj\Debug\net8.0\TaskManager.API.csproj.AssemblyReference.cache
+E:\Project Task Manager\Task-Manager-Project\Backend\TaskManager\src\TaskManager.API\obj\Debug\net8.0\rpswa.dswa.cache.json
+E:\Project Task Manager\Task-Manager-Project\Backend\TaskManager\src\TaskManager.API\obj\Debug\net8.0\TaskManager.API.GeneratedMSBuildEditorConfig.editorconfig
+E:\Project Task Manager\Task-Manager-Project\Backend\TaskManager\src\TaskManager.API\obj\Debug\net8.0\TaskManager.API.AssemblyInfoInputs.cache
+E:\Project Task Manager\Task-Manager-Project\Backend\TaskManager\src\TaskManager.API\obj\Debug\net8.0\TaskManager.API.AssemblyInfo.cs
+E:\Project Task Manager\Task-Manager-Project\Backend\TaskManager\src\TaskManager.API\obj\Debug\net8.0\TaskManager.API.csproj.CoreCompileInputs.cache
+E:\Project Task Manager\Task-Manager-Project\Backend\TaskManager\src\TaskManager.API\obj\Debug\net8.0\TaskManager.API.MvcApplicationPartsAssemblyInfo.cache
+E:\Project Task Manager\Task-Manager-Project\Backend\TaskManager\src\TaskManager.API\obj\Debug\net8.0\TaskManager.API.sourcelink.json
 E:\Project Task Manager\Task-Manager-Project\Backend\TaskManager\src\TaskManager.API\bin\Debug\net8.0\appsettings.Development.json
 E:\Project Task Manager\Task-Manager-Project\Backend\TaskManager\src\TaskManager.API\bin\Debug\net8.0\appsettings.json
 E:\Project Task Manager\Task-Manager-Project\Backend\TaskManager\src\TaskManager.API\bin\Debug\net8.0\TaskManager.API.staticwebassets.endpoints.json
@@ -50,7 +58,11 @@ E:\Project Task Manager\Task-Manager-Project\Backend\TaskManager\src\TaskManager
 E:\Project Task Manager\Task-Manager-Project\Backend\TaskManager\src\TaskManager.API\bin\Debug\net8.0\Azure.Core.dll
 E:\Project Task Manager\Task-Manager-Project\Backend\TaskManager\src\TaskManager.API\bin\Debug\net8.0\Azure.Identity.dll
 E:\Project Task Manager\Task-Manager-Project\Backend\TaskManager\src\TaskManager.API\bin\Debug\net8.0\BCrypt-Net-Next.dll
+E:\Project Task Manager\Task-Manager-Project\Backend\TaskManager\src\TaskManager.API\bin\Debug\net8.0\FluentValidation.dll
+E:\Project Task Manager\Task-Manager-Project\Backend\TaskManager\src\TaskManager.API\bin\Debug\net8.0\FluentValidation.AspNetCore.dll
+E:\Project Task Manager\Task-Manager-Project\Backend\TaskManager\src\TaskManager.API\bin\Debug\net8.0\FluentValidation.DependencyInjectionExtensions.dll
 E:\Project Task Manager\Task-Manager-Project\Backend\TaskManager\src\TaskManager.API\bin\Debug\net8.0\Humanizer.dll
+E:\Project Task Manager\Task-Manager-Project\Backend\TaskManager\src\TaskManager.API\bin\Debug\net8.0\Microsoft.AspNetCore.Authentication.JwtBearer.dll
 E:\Project Task Manager\Task-Manager-Project\Backend\TaskManager\src\TaskManager.API\bin\Debug\net8.0\Microsoft.Bcl.AsyncInterfaces.dll
 E:\Project Task Manager\Task-Manager-Project\Backend\TaskManager\src\TaskManager.API\bin\Debug\net8.0\Microsoft.Bcl.Cryptography.dll
 E:\Project Task Manager\Task-Manager-Project\Backend\TaskManager\src\TaskManager.API\bin\Debug\net8.0\Microsoft.CodeAnalysis.dll
@@ -72,6 +84,7 @@ E:\Project Task Manager\Task-Manager-Project\Backend\TaskManager\src\TaskManager
 E:\Project Task Manager\Task-Manager-Project\Backend\TaskManager\src\TaskManager.API\bin\Debug\net8.0\Microsoft.Extensions.DependencyModel.dll
 E:\Project Task Manager\Task-Manager-Project\Backend\TaskManager\src\TaskManager.API\bin\Debug\net8.0\Microsoft.Extensions.Logging.dll
 E:\Project Task Manager\Task-Manager-Project\Backend\TaskManager\src\TaskManager.API\bin\Debug\net8.0\Microsoft.Extensions.Logging.Abstractions.dll
+E:\Project Task Manager\Task-Manager-Project\Backend\TaskManager\src\TaskManager.API\bin\Debug\net8.0\Microsoft.Extensions.ObjectPool.dll
 E:\Project Task Manager\Task-Manager-Project\Backend\TaskManager\src\TaskManager.API\bin\Debug\net8.0\Microsoft.Extensions.Options.dll
 E:\Project Task Manager\Task-Manager-Project\Backend\TaskManager\src\TaskManager.API\bin\Debug\net8.0\Microsoft.Extensions.Options.ConfigurationExtensions.dll
 E:\Project Task Manager\Task-Manager-Project\Backend\TaskManager\src\TaskManager.API\bin\Debug\net8.0\Microsoft.Extensions.Primitives.dll
@@ -176,15 +189,6 @@ E:\Project Task Manager\Task-Manager-Project\Backend\TaskManager\src\TaskManager
 E:\Project Task Manager\Task-Manager-Project\Backend\TaskManager\src\TaskManager.API\bin\Debug\net8.0\TaskManager.Application.pdb
 E:\Project Task Manager\Task-Manager-Project\Backend\TaskManager\src\TaskManager.API\bin\Debug\net8.0\TaskManager.Infrastructure.pdb
 E:\Project Task Manager\Task-Manager-Project\Backend\TaskManager\src\TaskManager.API\bin\Debug\net8.0\TaskManager.Domain.pdb
-E:\Project Task Manager\Task-Manager-Project\Backend\TaskManager\src\TaskManager.API\obj\Debug\net8.0\TaskManager.API.csproj.AssemblyReference.cache
-E:\Project Task Manager\Task-Manager-Project\Backend\TaskManager\src\TaskManager.API\obj\Debug\net8.0\rpswa.dswa.cache.json
-E:\Project Task Manager\Task-Manager-Project\Backend\TaskManager\src\TaskManager.API\obj\Debug\net8.0\TaskManager.API.GeneratedMSBuildEditorConfig.editorconfig
-E:\Project Task Manager\Task-Manager-Project\Backend\TaskManager\src\TaskManager.API\obj\Debug\net8.0\TaskManager.API.AssemblyInfoInputs.cache
-E:\Project Task Manager\Task-Manager-Project\Backend\TaskManager\src\TaskManager.API\obj\Debug\net8.0\TaskManager.API.AssemblyInfo.cs
-E:\Project Task Manager\Task-Manager-Project\Backend\TaskManager\src\TaskManager.API\obj\Debug\net8.0\TaskManager.API.csproj.CoreCompileInputs.cache
-E:\Project Task Manager\Task-Manager-Project\Backend\TaskManager\src\TaskManager.API\obj\Debug\net8.0\TaskManager.API.MvcApplicationPartsAssemblyInfo.cs
-E:\Project Task Manager\Task-Manager-Project\Backend\TaskManager\src\TaskManager.API\obj\Debug\net8.0\TaskManager.API.MvcApplicationPartsAssemblyInfo.cache
-E:\Project Task Manager\Task-Manager-Project\Backend\TaskManager\src\TaskManager.API\obj\Debug\net8.0\TaskManager.API.sourcelink.json
 E:\Project Task Manager\Task-Manager-Project\Backend\TaskManager\src\TaskManager.API\obj\Debug\net8.0\rjimswa.dswa.cache.json
 E:\Project Task Manager\Task-Manager-Project\Backend\TaskManager\src\TaskManager.API\obj\Debug\net8.0\rjsmrazor.dswa.cache.json
 E:\Project Task Manager\Task-Manager-Project\Backend\TaskManager\src\TaskManager.API\obj\Debug\net8.0\rjsmcshtml.dswa.cache.json
@@ -200,4 +204,3 @@ E:\Project Task Manager\Task-Manager-Project\Backend\TaskManager\src\TaskManager
 E:\Project Task Manager\Task-Manager-Project\Backend\TaskManager\src\TaskManager.API\obj\Debug\net8.0\TaskManager.API.pdb
 E:\Project Task Manager\Task-Manager-Project\Backend\TaskManager\src\TaskManager.API\obj\Debug\net8.0\TaskManager.API.genruntimeconfig.cache
 E:\Project Task Manager\Task-Manager-Project\Backend\TaskManager\src\TaskManager.API\obj\Debug\net8.0\ref\TaskManager.API.dll
-E:\Project Task Manager\Task-Manager-Project\Backend\TaskManager\src\TaskManager.API\bin\Debug\net8.0\Microsoft.AspNetCore.Authentication.JwtBearer.dll

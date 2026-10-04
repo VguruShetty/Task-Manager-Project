@@ -4,9 +4,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
+using TaskManager.Application.Common.Models;
+using TaskManager.Application.DTOs.Tasks;
 using TaskManager.Application.Interfaces;
 using TaskManager.Domain.Entities;
 using TaskManager.Domain.Enums;
+using TaskManager.Infrastructure.Extensions;
 
 namespace TaskManager.Infrastructure.Repositories
 {
@@ -35,6 +38,52 @@ namespace TaskManager.Infrastructure.Repositories
 
         //    return await query.ToListAsync(ct);
         //}
+        public async Task<PagedResult<TaskItem>> GetPagedAsync(TaskQueryParameters parameters, Guid currentUserId, CancellationToken ct = default)
+        {
+            var query = _context.Tasks
+                .Include(t => t.Project)
+                .Include(t => t.AssignedToUser)
+                .Include(t => t.Tags)
+                .AsNoTracking()
+                // Tenant isolation: current user must own the project or be assigned
+                .Where(t => t.Project.OwnerId == currentUserId || t.AssignedToUserId == currentUserId);
+
+            // --- Filtering ---
+            if (parameters.ProjectId.HasValue)
+                query = query.Where(t => t.ProjectId == parameters.ProjectId.Value);
+
+            if (parameters.Status.HasValue)
+                query = query.Where(t => t.Status == parameters.Status.Value);
+
+            if (parameters.Priority.HasValue)
+                query = query.Where(t => t.Priority == parameters.Priority.Value);
+
+            if (parameters.AssignedToUserId.HasValue)
+                query = query.Where(t => t.AssignedToUserId == parameters.AssignedToUserId.Value);
+
+            if (parameters.DueBeforeUtc.HasValue)
+                query = query.Where(t => t.DueDateUtc.HasValue && t.DueDateUtc.Value <= parameters.DueBeforeUtc.Value);
+
+            // --- Free-text Search ---
+            if (!string.IsNullOrWhiteSpace(parameters.SearchTerm))
+            {
+                var search = parameters.SearchTerm.Trim().ToLower();
+                query = query.Where(t => t.Title.ToLower().Contains(search) ||
+                                         (t.Description != null && t.Description.ToLower().Contains(search)));
+            }
+
+            // --- Sorting ---
+            query = parameters.SortBy?.ToLower() switch
+            {
+                "title" => parameters.IsDescending ? query.OrderByDescending(t => t.Title) : query.OrderBy(t => t.Title),
+                "priority" => parameters.IsDescending ? query.OrderByDescending(t => t.Priority) : query.OrderBy(t => t.Priority),
+                "status" => parameters.IsDescending ? query.OrderByDescending(t => t.Status) : query.OrderBy(t => t.Status),
+                "duedate" => parameters.IsDescending ? query.OrderByDescending(t => t.DueDateUtc) : query.OrderBy(t => t.DueDateUtc),
+                _ => parameters.IsDescending ? query.OrderByDescending(t => t.CreatedAtUtc) : query.OrderBy(t => t.CreatedAtUtc)
+            };
+
+            return await query.ToPagedResultAsync(parameters.PageNumber, parameters.PageSize, ct);
+        }
         public async Task<IEnumerable<TaskItem>> GetAllAsync(Guid? projectId, TaskItemStatus? status, CancellationToken ct = default)
         {
             var query = _context.Tasks

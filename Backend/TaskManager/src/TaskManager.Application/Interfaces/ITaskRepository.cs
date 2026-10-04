@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using TaskManager.Application.Common.Models;
+using TaskManager.Application.DTOs.Tasks;
 using TaskManager.Domain.Entities;
 using TaskManager.Domain.Enums;
 
@@ -10,6 +12,7 @@ namespace TaskManager.Application.Interfaces
 {
     public interface ITaskRepository
     {
+        Task<PagedResult<TaskItem>> GetPagedAsync(TaskQueryParameters parameters, Guid currentUserId, CancellationToken ct = default);
         Task<IEnumerable<TaskItem>> GetAllAsync(Guid? projectId, TaskItemStatus? status, CancellationToken ct = default);
         Task<TaskItem?> GetByIdAsync(Guid id, CancellationToken ct = default);
         Task<TaskItem> AddAsync(TaskItem task, List<Guid>? tagIds, CancellationToken ct = default);

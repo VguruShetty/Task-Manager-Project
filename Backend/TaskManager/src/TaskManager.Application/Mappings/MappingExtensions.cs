@@ -86,5 +86,25 @@ namespace TaskManager.Application.Mappings
                 OwnerId = dto.OwnerId
             };
         }
+
+        public static TagDto ToDto(this Tag tag)
+        {
+            return new TagDto
+            {
+                Id = tag.Id,
+                Name = tag.Name,
+                ColorHex = tag.ColorHex
+            };
+        }
+
+        public static Tag ToEntity(this CreateTagDto dto)
+        {
+            return new Tag
+            {
+                Id = Guid.NewGuid(),
+                Name = dto.Name.Trim(),
+                ColorHex = dto.ColorHex.Trim()
+            };
+        }
     }
 }

@@ -1,4 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
+using TaskManager.Application.Common.Models;
+using TaskManager.Application.DTOs.Tasks;
+using TaskManager.Application.Interfaces;
 
 namespace TaskManager.API.Controllers
 {
@@ -6,6 +9,7 @@ namespace TaskManager.API.Controllers
     [Route("[controller]")]
     public class WeatherForecastController : ControllerBase
     {
+        private readonly ITaskService _taskService;
         private static readonly string[] Summaries = new[]
         {
             "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
@@ -16,7 +20,7 @@ namespace TaskManager.API.Controllers
         public WeatherForecastController(ILogger<WeatherForecastController> logger)
         {
             _logger = logger;
-        }
+        }        
 
         [HttpGet(Name = "GetWeatherForecast")]
         public IEnumerable<WeatherForecast> Get()

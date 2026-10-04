@@ -1,10 +1,11 @@
 {
   "version": 2,
-  "dgSpecHash": "WMOgHTAYesw=",
+  "dgSpecHash": "V+UEeMwFwN0=",
   "success": true,
   "projectFilePath": "E:\\Project Task Manager\\Task-Manager-Project\\Backend\\TaskManager\\src\\TaskManager.Application\\TaskManager.Application.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\Hp\\.nuget\\packages\\fluentvalidation\\12.1.1\\fluentvalidation.12.1.1.nupkg.sha512",
+    "C:\\Users\\Hp\\.nuget\\packages\\fluentvalidation.dependencyinjectionextensions\\12.1.1\\fluentvalidation.dependencyinjectionextensions.12.1.1.nupkg.sha512",
     "C:\\Users\\Hp\\.nuget\\packages\\microsoft.aspnetcore.http\\2.3.13\\microsoft.aspnetcore.http.2.3.13.nupkg.sha512",
     "C:\\Users\\Hp\\.nuget\\packages\\microsoft.aspnetcore.http.abstractions\\2.3.12\\microsoft.aspnetcore.http.abstractions.2.3.12.nupkg.sha512",
     "C:\\Users\\Hp\\.nuget\\packages\\microsoft.aspnetcore.http.features\\2.3.11\\microsoft.aspnetcore.http.features.2.3.11.nupkg.sha512",

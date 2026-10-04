@@ -11,6 +11,7 @@ using TaskManager.Application.Services;
 using TaskManager.Infrastructure;
 using TaskManager.Infrastructure.Authentication;
 using TaskManager.Infrastructure.Repositories;
+using TaskManager.Application;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -67,6 +68,8 @@ builder.Services.AddScoped<ITaskRepository, TaskRepository>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IProjectService, ProjectService>();
 builder.Services.AddScoped<ITaskService, TaskService>();
+builder.Services.AddScoped<ITagRepository, TagRepository>();
+builder.Services.AddScoped<ITagService, TagService>();
 
 // -------------------------------------------------------------
 // 3. JWT Authentication Setup
