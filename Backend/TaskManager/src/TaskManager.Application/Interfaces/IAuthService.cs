@@ -11,5 +11,7 @@ namespace TaskManager.Application.Interfaces
     {
         Task<AuthResponseDto> RegisterAsync(RegisterRequestDto dto, CancellationToken ct = default);
         Task<AuthResponseDto> LoginAsync(LoginRequestDto dto, CancellationToken ct = default);
+        Task<AuthResponseDto> RefreshTokenAsync(RefreshTokenRequestDto dto, CancellationToken ct = default);
+        Task<bool> RevokeTokenAsync(RevokeTokenRequestDto dto, CancellationToken ct = default);
     }
 }
