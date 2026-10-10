@@ -1,18 +1,19 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
+using TaskManager.Application.Common.Models;
 using TaskManager.Application.DTOs.Projects;
 
-namespace TaskManager.Application.Interfaces
+namespace TaskManager.Application.Interfaces;
+
+public interface IProjectService
 {
-    public interface IProjectService
-    {
-        Task<IEnumerable<ProjectResponseDto>> GetAllAsync(Guid? ownerId, CancellationToken ct = default);
-        Task<ProjectResponseDto?> GetByIdAsync(Guid id, CancellationToken ct = default);
-        Task<ProjectResponseDto> CreateAsync(CreateProjectDto dto, CancellationToken ct = default);
-        Task<bool> UpdateAsync(Guid id, UpdateProjectDto dto, CancellationToken ct = default);
-        Task<bool> DeleteAsync(Guid id, CancellationToken ct = default);
-    }
+    Task<PagedResult<ProjectResponseDto>> GetProjectsAsync(
+        ProjectQueryParameters parameters,
+        CancellationToken ct = default);
+
+    Task<ProjectResponseDto?> GetProjectByIdAsync(Guid id, CancellationToken ct = default);
+    Task<ProjectResponseDto> CreateProjectAsync(CreateProjectDto dto, CancellationToken ct = default);
+    Task<bool> UpdateProjectAsync(Guid id, UpdateProjectDto dto, CancellationToken ct = default);
+    Task<bool> DeleteProjectAsync(Guid id, CancellationToken ct = default);
 }

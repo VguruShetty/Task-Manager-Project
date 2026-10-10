@@ -1,72 +1,97 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
+using TaskManager.Application.Common.Models;
+using TaskManager.Application.DTOs.Projects;
 using TaskManager.Application.Interfaces;
 using TaskManager.Domain.Entities;
+using TaskManager.Infrastructure.Extensions;
 
-namespace TaskManager.Infrastructure.Repositories
+namespace TaskManager.Infrastructure.Repositories;
+
+public class ProjectRepository : IProjectRepository
 {
-    public class ProjectRepository : IProjectRepository
+    private readonly AppDbContext _context;
+
+    public ProjectRepository(AppDbContext context)
     {
-        private readonly AppDbContext _context;
+        _context = context;
+    }
 
-        public ProjectRepository(AppDbContext context)
+    public async Task<PagedResult<Project>> GetPagedAsync(
+        ProjectQueryParameters parameters,
+        Guid ownerId,
+        CancellationToken ct = default)
+    {
+        var query = _context.Projects
+            .Include(p => p.Tasks)
+            .AsNoTracking()
+            .Where(p => p.OwnerId == ownerId);
+
+        // --- Free-text Search ---
+        if (!string.IsNullOrWhiteSpace(parameters.SearchTerm))
         {
-            _context = context;
+            var search = parameters.SearchTerm.Trim().ToLower();
+            query = query.Where(p => p.Name.ToLower().Contains(search) ||
+                                     (p.Description != null && p.Description.ToLower().Contains(search)));
         }
 
-        public async Task<IEnumerable<Project>> GetAllAsync(Guid? ownerId, CancellationToken ct = default)
+        // --- Optional Date Filters from ProjectQueryParameters ---
+        if (parameters.CreatedAfterUtc.HasValue)
         {
-            var query = _context.Projects
-                .Include(p => p.Owner)
-                .Include(p => p.Tasks)
-                    .ThenInclude(t => t.Tags)
-                .Include(p => p.Tasks)
-                    .ThenInclude(t => t.AssignedToUser)
-                .AsNoTracking()
-                .AsQueryable();
-
-            if (ownerId.HasValue)
-                query = query.Where(p => p.OwnerId == ownerId.Value);
-
-            return await query.ToListAsync(ct);
+            query = query.Where(p => p.CreatedAtUtc >= parameters.CreatedAfterUtc.Value);
         }
 
-        public async Task<Project?> GetByIdAsync(Guid id, CancellationToken ct = default)
+        if (parameters.CreatedBeforeUtc.HasValue)
         {
-            return await _context.Projects
-                .Include(p => p.Owner)
-                .Include(p => p.Tasks)
-                    .ThenInclude(t => t.Tags)
-                .Include(p => p.Tasks)
-                    .ThenInclude(t => t.AssignedToUser)
-                .FirstOrDefaultAsync(p => p.Id == id, ct);
+            query = query.Where(p => p.CreatedAtUtc <= parameters.CreatedBeforeUtc.Value);
         }
 
-        public async Task<Project> AddAsync(Project project, CancellationToken ct = default)
+        if (parameters.HasTasks.HasValue)
         {
-            await _context.Projects.AddAsync(project, ct);
-            await _context.SaveChangesAsync(ct);
-            return project;
+            query = parameters.HasTasks.Value
+                ? query.Where(p => p.Tasks.Any())
+                : query.Where(p => !p.Tasks.Any());
         }
 
-        public async Task UpdateAsync(Project project, CancellationToken ct = default)
+        // --- Sorting ---
+        // Notice: Use p.Tasks.Count() with parentheses so EF Core translates it to COUNT(*) in SQL
+        query = parameters.SortBy?.ToLower() switch
         {
-            _context.Projects.Update(project);
-            await _context.SaveChangesAsync(ct);
-        }
+            "name" => parameters.IsDescending ? query.OrderByDescending(p => p.Name) : query.OrderBy(p => p.Name),
+            "taskcount" => parameters.IsDescending ? query.OrderByDescending(p => p.Tasks.Count()) : query.OrderBy(p => p.Tasks.Count()),
+            "updatedat" => parameters.IsDescending ? query.OrderByDescending(p => p.UpdatedAtUtc) : query.OrderBy(p => p.UpdatedAtUtc),
+            _ => parameters.IsDescending ? query.OrderByDescending(p => p.CreatedAtUtc) : query.OrderBy(p => p.CreatedAtUtc)
+        };
 
-        public async Task<bool> DeleteAsync(Guid id, CancellationToken ct = default)
-        {
-            var project = await _context.Projects.FindAsync(new object[] { id }, ct);
-            if (project is null) return false;
+        return await query.ToPagedResultAsync(parameters.PageNumber, parameters.PageSize, ct);
+    }
 
-            _context.Projects.Remove(project);
-            await _context.SaveChangesAsync(ct);
-            return true;
-        }
+    public async Task<Project?> GetByIdAsync(Guid id, CancellationToken ct = default)
+    {
+        return await _context.Projects
+            .Include(p => p.Tasks)
+            .FirstOrDefaultAsync(p => p.Id == id, ct);
+    }
+
+    public async Task<Project> AddAsync(Project project, CancellationToken ct = default)
+    {
+        await _context.Projects.AddAsync(project, ct);
+        await _context.SaveChangesAsync(ct);
+        return project;
+    }
+
+    public async Task UpdateAsync(Project project, CancellationToken ct = default)
+    {
+        _context.Projects.Update(project);
+        await _context.SaveChangesAsync(ct);
+    }
+
+    public async Task<bool> DeleteAsync(Guid id, CancellationToken ct = default)
+    {
+        var project = await _context.Projects.FindAsync(new object[] { id }, ct);
+        if (project is null) return false;
+
+        _context.Projects.Remove(project);
+        await _context.SaveChangesAsync(ct);
+        return true;
     }
 }

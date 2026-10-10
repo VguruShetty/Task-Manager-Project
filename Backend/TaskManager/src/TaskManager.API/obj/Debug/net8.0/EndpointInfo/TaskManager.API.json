@@ -31,8 +31,8 @@
           }
         },
         "responses": {
-          "200": {
-            "description": "OK",
+          "201": {
+            "description": "Created",
             "content": {
               "application/json": {
                 "schema": {
@@ -51,8 +51,8 @@
               }
             }
           },
-          "409": {
-            "description": "Conflict",
+          "429": {
+            "description": "Too Many Requests",
             "content": {
               "application/json": {
                 "schema": {
@@ -108,6 +108,16 @@
                 }
               }
             }
+          },
+          "429": {
+            "description": "Too Many Requests",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
           }
         }
       }
@@ -149,6 +159,16 @@
           },
           "401": {
             "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too Many Requests",
             "content": {
               "application/json": {
                 "schema": {
@@ -208,11 +228,63 @@
         ],
         "parameters": [
           {
-            "name": "ownerId",
+            "name": "CreatedAfterUtc",
             "in": "query",
             "schema": {
               "type": "string",
-              "format": "uuid"
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "CreatedBeforeUtc",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "HasTasks",
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "PageNumber",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "PageSize",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "SearchTerm",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "SortBy",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "IsDescending",
+            "in": "query",
+            "schema": {
+              "type": "boolean"
             }
           }
         ],
@@ -222,10 +294,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/ProjectResponseDto"
-                  }
+                  "$ref": "#/components/schemas/ProjectResponseDtoPagedResult"
                 }
               }
             }
@@ -1206,19 +1275,60 @@
             "type": "string",
             "nullable": true
           },
+          "ownerId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "taskCount": {
+            "type": "integer",
+            "format": "int32"
+          },
           "createdAtUtc": {
             "type": "string",
             "format": "date-time"
           },
-          "owner": {
-            "$ref": "#/components/schemas/UserSummaryDto"
-          },
-          "tasks": {
+          "updatedAtUtc": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "ProjectResponseDtoPagedResult": {
+        "type": "object",
+        "properties": {
+          "items": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/TaskItemResponseDto"
+              "$ref": "#/components/schemas/ProjectResponseDto"
             },
             "nullable": true
+          },
+          "pageNumber": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "pageSize": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "totalCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "totalPages": {
+            "type": "integer",
+            "format": "int32",
+            "readOnly": true
+          },
+          "hasPreviousPage": {
+            "type": "boolean",
+            "readOnly": true
+          },
+          "hasNextPage": {
+            "type": "boolean",
+            "readOnly": true
           }
         },
         "additionalProperties": false

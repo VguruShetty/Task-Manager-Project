@@ -64,16 +64,10 @@ namespace TaskManager.Application.Mappings
                 Id = project.Id,
                 Name = project.Name,
                 Description = project.Description,
+                OwnerId = project.OwnerId,
+                TaskCount = project.Tasks?.Count ?? 0,
                 CreatedAtUtc = project.CreatedAtUtc,
-                Owner = project.Owner != null
-                    ? new UserSummaryDto
-                    {
-                        Id = project.Owner.Id,
-                        FullName = project.Owner.FullName,
-                        Email = project.Owner.Email
-                    }
-                    : null,
-                Tasks = project.Tasks.Select(t => t.ToDto()).ToList()
+                UpdatedAtUtc = project.UpdatedAtUtc
             };
         }
 
