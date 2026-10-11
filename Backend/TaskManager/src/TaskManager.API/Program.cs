@@ -1,14 +1,14 @@
+using System.Net.Mime;
 using System.Text;
 using System.Text.Json;
 using System.Threading.RateLimiting;
-using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using TaskManager.API.Middleware;
-using TaskManager.Application;
 using TaskManager.Application.Interfaces;
 using TaskManager.Application.Services;
 using TaskManager.Infrastructure;
@@ -16,120 +16,79 @@ using TaskManager.Infrastructure.Authentication;
 using TaskManager.Infrastructure.Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
-// 1. Define the Rate Limiting Policy
-builder.Services.AddRateLimiter(options =>
-{
-    // Return 429 Too Many Requests when rejected
-    options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
 
-    // Custom RFC 7807 ProblemDetails payload when rate limit is exceeded
-    options.OnRejected = async (context, token) =>
-    {
-        context.HttpContext.Response.ContentType = "application/problem+json";
-
-        var problemDetails = new ProblemDetails
-        {
-            Status = StatusCodes.Status429TooManyRequests,
-            Title = "Too Many Requests",
-            Detail = "Rate limit exceeded. Please wait a moment before trying again.",
-            Instance = context.HttpContext.Request.Path
-        };
-
-        if (context.Lease.TryGetMetadata(MetadataName.RetryAfter, out var retryAfter))
-        {
-            context.HttpContext.Response.Headers.RetryAfter = ((int)retryAfter.TotalSeconds).ToString();
-            problemDetails.Extensions["retryAfterSeconds"] = (int)retryAfter.TotalSeconds;
-        }
-
-        await context.HttpContext.Response.WriteAsync(
-            JsonSerializer.Serialize(problemDetails, new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase }),
-            cancellationToken: token);
-    };
-
-    // Partition by Client IP: 5 attempts per 1 minute window per IP address
-    options.AddPolicy("AuthRateLimit", httpContext =>
-    {
-        // Extract real IP (respecting proxy headers like X-Forwarded-For if configured)
-        var clientIp = httpContext.Connection.RemoteIpAddress?.ToString() ?? "unknown_client";
-
-        return RateLimitPartition.GetSlidingWindowLimiter(
-            partitionKey: clientIp,
-            factory: _ => new SlidingWindowRateLimiterOptions
-            {
-                PermitLimit = 5,
-                Window = TimeSpan.FromMinutes(1),
-                SegmentsPerWindow = 3, // Refreshes 1/3 of the quota every 20 seconds
-                QueueLimit = 0,        // Immediately reject; do not buffer login attacks
-                AutoReplenishment = true
-            });
-    });
-});
-
-// -------------------------------------------------------------
-// 1. Database & Infrastructure
-// -------------------------------------------------------------
+// ==========================================
+// 1. Database Context
+// ==========================================
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-// Bind JwtSettings strongly-typed options
-builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection(JwtSettings.SectionName));
-builder.Services.AddHttpContextAccessor();
+// ==========================================
+// 2. Health Checks Configuration
+// ==========================================
+builder.Services.AddHealthChecks()
+    .AddDbContextCheck<AppDbContext>(
+        name: "database",
+        failureStatus: HealthStatus.Unhealthy,
+        tags: new[] { "db", "sql" });
 
-builder.Services.AddApplicationServices();
-builder.Services.AddFluentValidationAutoValidation();
-builder.Services.AddFluentValidationClientsideAdapters();
-builder.Services.Configure<ApiBehaviorOptions>(options =>
-{
-    options.InvalidModelStateResponseFactory = context =>
-    {
-        var errors = context.ModelState
-            .Where(e => e.Value?.Errors.Count > 0)
-            .ToDictionary(
-                kvp => kvp.Key,
-                kvp => kvp.Value!.Errors.Select(e => e.ErrorMessage).ToArray()
-            );
-
-        var problemDetails = new ValidationProblemDetails(context.ModelState)
-        {
-            Type = "https://tools.ietf.org/html/rfc7231#section-6.5.1",
-            Title = "One or more validation errors occurred.",
-            Status = StatusCodes.Status400BadRequest,
-            Instance = context.HttpContext.Request.Path,
-            Detail = "Please refer to the errors property for additional details."
-        };
-
-        return new BadRequestObjectResult(problemDetails)
-        {
-            ContentTypes = { "application/problem+json" }
-        };
-    };
-});
-// -------------------------------------------------------------
-// 2. Dependency Injection (Repositories & Services)
-// -------------------------------------------------------------
-builder.Services.AddSingleton<IPasswordHasher, PasswordHasher>();
-builder.Services.AddSingleton<IJwtTokenGenerator, JwtTokenGenerator>();
-builder.Services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
-builder.Services.AddScoped<IAuthService, AuthService>();
-
+// ==========================================
+// 3. Dependency Injection (Services & Repositories)
+// ==========================================
 builder.Services.AddScoped<IUserRepository, UserRepository>();
-builder.Services.AddScoped<ICurrentUserService, CurrentUserService>();
+builder.Services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
 builder.Services.AddScoped<IProjectRepository, ProjectRepository>();
 builder.Services.AddScoped<ITaskRepository, TaskRepository>();
 
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IProjectService, ProjectService>();
 builder.Services.AddScoped<ITaskService, TaskService>();
-builder.Services.AddScoped<ITagRepository, TagRepository>();
-builder.Services.AddScoped<ITagService, TagService>();
+builder.Services.AddScoped<IPasswordHasher, PasswordHasher>();
+builder.Services.AddScoped<IJwtTokenGenerator, JwtTokenGenerator>();
+builder.Services.AddScoped<ICurrentUserService, CurrentUserService>();
+builder.Services.AddHttpContextAccessor();
 
+// ==========================================
+// 4. JWT Authentication
+// ==========================================
+//var jwtSettings = builder.Configuration.GetSection("JwtSettings");
+//var secretKey = jwtSettings["Secret"] ?? throw new InvalidOperationException("JWT Secret is missing.");
 
-// -------------------------------------------------------------
-// 3. JWT Authentication Setup
-// -------------------------------------------------------------
+//builder.Services.AddAuthentication(options =>
+//{
+//    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+//    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+//})
+//.AddJwtBearer(options =>
+//{
+//    options.RequireHttpsMetadata = false; // Set to true in strict production environments
+//    options.SaveToken = true;
+//    options.TokenValidationParameters = new TokenValidationParameters
+//    {
+//        ValidateIssuerSigningKey = true,
+//        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey)),
+//        ValidateIssuer = true,
+//        ValidIssuer = jwtSettings["Issuer"],
+//        ValidateAudience = true,
+//        ValidAudience = jwtSettings["Audience"],
+//        ValidateLifetime = true,
+//        ClockSkew = TimeSpan.Zero
+//    };
+//});
+// 1. Bind JwtSettings to IOptions<JwtSettings>
+builder.Services.Configure<JwtSettings>(
+    builder.Configuration.GetSection(JwtSettings.SectionName));
+
+// 2. Read settings directly for AddJwtBearer token validation parameters
 var jwtSettings = builder.Configuration.GetSection(JwtSettings.SectionName).Get<JwtSettings>()
     ?? throw new InvalidOperationException("JwtSettings section is missing from configuration.");
 
+if (string.IsNullOrWhiteSpace(jwtSettings.Secret) || Encoding.UTF8.GetBytes(jwtSettings.Secret).Length < 32)
+{
+    throw new InvalidOperationException("JwtSettings:Secret must be configured and at least 32 bytes long.");
+}
+
+// 3. Register JWT Authentication using the bound settings
 builder.Services.AddAuthentication(options =>
 {
     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -137,93 +96,150 @@ builder.Services.AddAuthentication(options =>
 })
 .AddJwtBearer(options =>
 {
-    options.RequireHttpsMetadata = false; // Set to true in strict production
+    options.RequireHttpsMetadata = false;
     options.SaveToken = true;
     options.TokenValidationParameters = new TokenValidationParameters
     {
-        ValidateIssuer = true,
-        ValidateAudience = true,
-        ValidateLifetime = true,
         ValidateIssuerSigningKey = true,
-        ValidIssuer = jwtSettings.Issuer,
-        ValidAudience = jwtSettings.Audience,
         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings.Secret)),
-        ClockSkew = TimeSpan.Zero // Removes the default 5-minute token expiry grace period
+        ValidateIssuer = true,
+        ValidIssuer = jwtSettings.Issuer,
+        ValidateAudience = true,
+        ValidAudience = jwtSettings.Audience,
+        ValidateLifetime = true,
+        ClockSkew = TimeSpan.Zero
     };
 });
 
 builder.Services.AddAuthorization();
+
+// ==========================================
+// 5. Rate Limiting Configuration
+// ==========================================
+builder.Services.AddRateLimiter(options =>
+{
+    options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
+    options.AddPolicy("AuthRateLimit", httpContext =>
+    {
+        var clientIp = httpContext.Connection.RemoteIpAddress?.ToString() ?? "unknown_client";
+        return RateLimitPartition.GetSlidingWindowLimiter(
+            partitionKey: clientIp,
+            factory: _ => new SlidingWindowRateLimiterOptions
+            {
+                PermitLimit = 5,
+                Window = TimeSpan.FromMinutes(1),
+                SegmentsPerWindow = 3,
+                QueueLimit = 0,
+                AutoReplenishment = true
+            });
+    });
+});
+
+// ==========================================
+// 6. Controllers & Swagger with JWT UI
+// ==========================================
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 
-// -------------------------------------------------------------
-// 4. Swagger with JWT "Authorize" Button
-// -------------------------------------------------------------
 builder.Services.AddSwaggerGen(options =>
 {
     options.SwaggerDoc("v1", new OpenApiInfo
     {
-        Title = "Task Manager API",
+        Title = "TaskManager API",
         Version = "v1",
-        Description = "ASP.NET Core Web API for Task Management"
+        Description = "Clean Architecture Task Management API with JWT Auth, Refresh Tokens, and Rate Limiting."
     });
 
-    // Define Bearer token scheme
-    options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+    // Define Bearer Auth Scheme in Swagger
+    var securityScheme = new OpenApiSecurityScheme
     {
         Name = "Authorization",
-        Type = SecuritySchemeType.Http,
-        Scheme = "Bearer",
-        BearerFormat = "JWT",
+        Description = "Enter JWT Bearer token **_only_** (without 'Bearer ' prefix).",
         In = ParameterLocation.Header,
-        Description = "Enter your valid JWT token (without typing the word 'Bearer')."
-    });
+        Type = SecuritySchemeType.Http,
+        Scheme = "bearer",
+        BearerFormat = "JWT",
+        Reference = new OpenApiReference
+        {
+            Id = JwtBearerDefaults.AuthenticationScheme,
+            Type = ReferenceType.SecurityScheme
+        }
+    };
 
-    // Enforce Bearer scheme requirement globally in Swagger UI
+    options.AddSecurityDefinition(securityScheme.Reference.Id, securityScheme);
+
+    // Enforce scheme across secured endpoints
     options.AddSecurityRequirement(new OpenApiSecurityRequirement
     {
-        {
-            new OpenApiSecurityScheme
-            {
-                Reference = new OpenApiReference
-                {
-                    Type = ReferenceType.SecurityScheme,
-                    Id = "Bearer"
-                }
-            },
-            Array.Empty<string>()
-        }
+        { securityScheme, Array.Empty<string>() }
     });
 });
 
-// -------------------------------------------------------------
-// 5. Middleware Pipeline
-// -------------------------------------------------------------
+// ==========================================
+// Pipeline Execution
+// ==========================================
+//var app = builder.Build();
+
+//if (app.Environment.IsDevelopment())
+//{
+//    app.UseSwagger();
+//    app.UseSwaggerUI(c =>
+//    {
+//        c.SwaggerEndpoint("/swagger/v1/swagger.json", "TaskManager API v1");
+//        c.DisplayRequestDuration();
+//    });
+//}
+
+// 1. Register ProblemDetails and ExceptionHandler in DI
+builder.Services.AddProblemDetails();
+builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
+
 var app = builder.Build();
 
-app.UseMiddleware<ExceptionHandlingMiddleware>();
+// 2. Put UseExceptionHandler at the very top of the request pipeline
+app.UseExceptionHandler();
 
+// Followed by Swagger, HttpsRedirection, Routing, Auth, etc.
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
-    app.UseSwaggerUI(c =>
-    {
-        c.SwaggerEndpoint("/swagger/v1/swagger.json", "Task Manager API v1");
-    });
+    app.UseSwaggerUI();
 }
 
 app.UseHttpsRedirection();
-
 app.UseRouting();
-
-app.UseCors("AllowFrontend");
-
-// Must be placed between UseRouting() and UseAuthentication() / MapControllers()
+app.UseCors();
 app.UseRateLimiter();
-
-// NOTE: UseAuthentication must strictly come BEFORE UseAuthorization
 app.UseAuthentication();
 app.UseAuthorization();
+
+// Health Check Endpoint with Structured JSON Response
+app.MapHealthChecks("/health", new HealthCheckOptions
+{
+    ResponseWriter = async (context, report) =>
+    {
+        context.Response.ContentType = MediaTypeNames.Application.Json;
+
+        var response = new
+        {
+            status = report.Status.ToString(),
+            totalDuration = report.TotalDuration.TotalMilliseconds + " ms",
+            checks = report.Entries.Select(e => new
+            {
+                name = e.Key,
+                status = e.Value.Status.ToString(),
+                description = e.Value.Description,
+                duration = e.Value.Duration.TotalMilliseconds + " ms",
+                exception = e.Value.Exception?.Message
+            })
+        };
+
+        await context.Response.WriteAsync(JsonSerializer.Serialize(response, new JsonSerializerOptions
+        {
+            WriteIndented = true
+        }));
+    }
+});
 
 app.MapControllers();
 

@@ -1,8 +1,8 @@
 {
   "openapi": "3.0.1",
   "info": {
-    "title": "Task Manager API",
-    "description": "ASP.NET Core Web API for Task Management",
+    "title": "TaskManager API",
+    "description": "Clean Architecture Task Management API with JWT Auth, Refresh Tokens, and Rate Limiting.",
     "version": "v1"
   },
   "paths": {
@@ -1632,8 +1632,8 @@
     "securitySchemes": {
       "Bearer": {
         "type": "http",
-        "description": "Enter your valid JWT token (without typing the word 'Bearer').",
-        "scheme": "Bearer",
+        "description": "Enter JWT Bearer token **_only_** (without 'Bearer ' prefix).",
+        "scheme": "bearer",
         "bearerFormat": "JWT"
       }
     }
