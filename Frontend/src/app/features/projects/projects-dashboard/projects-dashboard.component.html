@@ -1,0 +1,92 @@
+<div class="dashboard-layout">
+  <!-- Navbar Header -->
+  <header class="top-nav">
+    <div class="brand">
+      <h2>Task Manager</h2>
+    </div>
+    <div class="user-meta">
+      <span>Welcome, <strong>{{ authService.currentUser()?.fullName }}</strong></span>
+      <button class="btn-secondary" (click)="authService.logout()">Sign Out</button>
+    </div>
+  </header>
+
+  <!-- Main Content Container -->
+  <main class="content-body">
+    <div class="actions-bar">
+      <input
+        type="text"
+        placeholder="Search projects..."
+        class="search-input"
+        (input)="onSearch($event)"
+      />
+      <button class="btn-primary" (click)="openCreateModal()">+ New Project</button>
+    </div>
+
+    <!-- Projects Grid -->
+    @if (isLoading()) {
+      <div class="loading-state">Loading your projects...</div>
+    } @else if (projects().length === 0) {
+      <div class="empty-state">
+        <p>No projects found. Create your first project to get started!</p>
+      </div>
+    } @else {
+      <div class="projects-grid">
+        @for (project of projects(); track project.id) {
+          <div class="project-card">
+            <div class="card-header">
+              <h3>{{ project.name }}</h3>
+              <button class="btn-icon" (click)="deleteProject(project.id)" title="Delete Project">✕</button>
+            </div>
+            <p class="description">{{ project.description || 'No description provided.' }}</p>
+            <div class="card-footer">
+              <span class="badge">{{ project.taskCount }} Tasks</span>
+              <span class="date">{{ project.createdAtUtc | date: 'mediumDate' }}</span>
+            </div>
+          </div>
+        }
+      </div>
+
+      <!-- Pagination Controls -->
+      <div class="pagination">
+        <button
+          [disabled]="pageNumber() <= 1"
+          (click)="onPageChange(pageNumber() - 1)">
+          Previous
+        </button>
+        <span>Page {{ pageNumber() }}</span>
+        <button
+          [disabled]="projects().length < pageSize()"
+          (click)="onPageChange(pageNumber() + 1)">
+          Next
+        </button>
+      </div>
+    }
+  </main>
+
+  <!-- Create Project Modal Dialog -->
+  @if (showModal()) {
+    <div class="modal-backdrop" (click)="closeCreateModal()">
+      <div class="modal-window" (click)="$event.stopPropagation()">
+        <h3>Create New Project</h3>
+        <form [formGroup]="createForm" (ngSubmit)="submitCreate()">
+          <div class="form-group">
+            <label for="name">Project Name</label>
+            <input id="name" type="text" formControlName="name" placeholder="e.g., Mobile App Launch" />
+          </div>
+
+          <div class="form-group">
+            <label for="description">Description</label>
+            <textarea id="description" rows="3" formControlName="description" placeholder="Project goals and scope..."></textarea>
+          </div>
+
+          <div class="modal-actions">
+            <button type="button" class="btn-secondary" (click)="closeCreateModal()">Cancel</button>
+            <button type="submit" class="btn-primary" [disabled]="createForm.invalid || isSubmitting()">
+              {{ isSubmitting() ? 'Saving...' : 'Create' }}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  }
+</div>

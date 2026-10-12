@@ -1,0 +1,57 @@
+<div class="auth-container">
+  <div class="auth-card">
+    <h2>Welcome Back</h2>
+    <p class="subtitle">Sign in to your account</p>
+
+    @if (errorMessage()) {
+      <div class="error-banner">
+        {{ errorMessage() }}
+      </div>
+    }
+
+    <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+      <div class="form-group">
+        <label for="email">Email</label>
+        <input
+          id="email"
+          type="email"
+          formControlName="email"
+          placeholder="you@example.com"
+          [class.invalid]="loginForm.get('email')?.touched && loginForm.get('email')?.invalid"
+        />
+        @if (loginForm.get('email')?.touched && loginForm.get('email')?.errors?.['required']) {
+          <small class="field-error">Email is required</small>
+        }
+        @if (loginForm.get('email')?.touched && loginForm.get('email')?.errors?.['email']) {
+          <small class="field-error">Please enter a valid email</small>
+        }
+      </div>
+
+      <div class="form-group">
+        <label for="password">Password</label>
+        <input
+          id="password"
+          type="password"
+          formControlName="password"
+          placeholder="••••••••"
+          [class.invalid]="loginForm.get('password')?.touched && loginForm.get('password')?.invalid"
+        />
+        @if (loginForm.get('password')?.touched && loginForm.get('password')?.errors?.['required']) {
+          <small class="field-error">Password is required</small>
+        }
+      </div>
+
+      <button type="submit" [disabled]="isLoading() || loginForm.invalid" class="btn-primary">
+        @if (isLoading()) {
+          Signing in...
+        } @else {
+          Sign In
+        }
+      </button>
+    </form>
+
+    <p class="footer-text">
+      Don't have an account? <a routerLink="/register">Create one</a>
+    </p>
+  </div>
+</div>

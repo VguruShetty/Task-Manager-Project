@@ -1,0 +1,71 @@
+<div class="auth-container">
+  <div class="auth-card">
+    <h2>Create an Account</h2>
+    <p class="subtitle">Start tracking your projects</p>
+
+    @if (errorMessage()) {
+      <div class="error-banner">
+        {{ errorMessage() }}
+      </div>
+    }
+
+    <form [formGroup]="registerForm" (ngSubmit)="onSubmit()">
+      <div class="form-group">
+        <label for="fullName">Full Name</label>
+        <input
+          id="fullName"
+          type="text"
+          formControlName="fullName"
+          placeholder="John Doe"
+          [class.invalid]="registerForm.get('fullName')?.touched && registerForm.get('fullName')?.invalid"
+        />
+        @if (registerForm.get('fullName')?.touched && registerForm.get('fullName')?.errors?.['required']) {
+          <small class="field-error">Full name is required</small>
+        }
+      </div>
+
+      <div class="form-group">
+        <label for="email">Email</label>
+        <input
+          id="email"
+          type="email"
+          formControlName="email"
+          placeholder="you@example.com"
+          [class.invalid]="registerForm.get('email')?.touched && registerForm.get('email')?.invalid"
+        />
+        @if (registerForm.get('email')?.touched && registerForm.get('email')?.errors?.['required']) {
+          <small class="field-error">Email is required</small>
+        }
+        @if (registerForm.get('email')?.touched && registerForm.get('email')?.errors?.['email']) {
+          <small class="field-error">Please enter a valid email</small>
+        }
+      </div>
+
+      <div class="form-group">
+        <label for="password">Password</label>
+        <input
+          id="password"
+          type="password"
+          formControlName="password"
+          placeholder="At least 6 characters"
+          [class.invalid]="registerForm.get('password')?.touched && registerForm.get('password')?.invalid"
+        />
+        @if (registerForm.get('password')?.touched && registerForm.get('password')?.errors?.['required']) {
+          <small class="field-error">Password is required</small>
+        }
+      </div>
+
+      <button type="submit" [disabled]="isLoading() || registerForm.invalid" class="btn-primary">
+        @if (isLoading()) {
+          Creating account...
+        } @else {
+          Register
+        }
+      </button>
+    </form>
+
+    <p class="footer-text">
+      Already have an account? <a routerLink="/login">Sign in</a>
+    </p>
+  </div>
+</div>
