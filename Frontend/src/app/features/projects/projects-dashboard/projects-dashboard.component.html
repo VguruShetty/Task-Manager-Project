@@ -34,7 +34,9 @@
         @for (project of projects(); track project.id) {
           <div class="project-card">
             <div class="card-header">
-              <h3>{{ project.name }}</h3>
+              <a [href]="'/projects/' + project.id">
+                <h3>{{ project.name }}</h3>
+              </a>              
               <button class="btn-icon" (click)="deleteProject(project.id)" title="Delete Project">✕</button>
             </div>
             <p class="description">{{ project.description || 'No description provided.' }}</p>

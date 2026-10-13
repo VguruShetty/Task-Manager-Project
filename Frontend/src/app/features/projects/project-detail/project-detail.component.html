@@ -1,0 +1,133 @@
+<div class="board-container">
+  <div class="header-bar">
+    <div>
+      <a routerLink="/projects" class="back-link">← Back to Projects</a>
+      <h2>Project Board</h2>
+    </div>
+    <button class="btn-primary" (click)="showModal.set(true)">+ Add Task</button>
+  </div>
+
+  @if (errorMessage()) {
+    <div class="error-banner">{{ errorMessage() }}</div>
+  }
+
+  @if (isLoading()) {
+    <p class="state-msg">Loading tasks...</p>
+  } @else {
+    <div class="kanban-grid" cdkDropListGroup>
+      
+      <!-- COLUMN 1: TODO -->
+      <div class="kanban-column">
+        <div class="column-header">
+          <h3>To Do</h3>
+          <span class="count">{{ todoTasks().length }}</span>
+        </div>
+        <div
+          cdkDropList
+          [cdkDropListData]="todoTasks()"
+          (cdkDropListDropped)="onDrop($event, 'Todo')"
+          class="card-drop-zone">
+          @for (task of todoTasks(); track task.id) {
+            <div class="kanban-card" cdkDrag [cdkDragData]="task">
+              <div class="card-top">
+                <span class="badge priority-{{ task.priority.toLowerCase() }}">{{ task.priority }}</span>
+                <button class="btn-icon" (click)="deleteTask(task.id)">✕</button>
+              </div>
+              <h4>{{ task.title }}</h4>
+              @if (task.description) {
+                <p class="desc">{{ task.description }}</p>
+              }
+            </div>
+          }
+        </div>
+      </div>
+
+      <!-- COLUMN 2: IN PROGRESS -->
+      <div class="kanban-column">
+        <div class="column-header">
+          <h3>In Progress</h3>
+          <span class="count">{{ inProgressTasks().length }}</span>
+        </div>
+        <div
+          cdkDropList
+          [cdkDropListData]="inProgressTasks()"
+          (cdkDropListDropped)="onDrop($event, 'InProgress')"
+          class="card-drop-zone">
+          @for (task of inProgressTasks(); track task.id) {
+            <div class="kanban-card" cdkDrag [cdkDragData]="task">
+              <div class="card-top">
+                <span class="badge priority-{{ task.priority.toLowerCase() }}">{{ task.priority }}</span>
+                <button class="btn-icon" (click)="deleteTask(task.id)">✕</button>
+              </div>
+              <h4>{{ task.title }}</h4>
+              @if (task.description) {
+                <p class="desc">{{ task.description }}</p>
+              }
+            </div>
+          }
+        </div>
+      </div>
+
+      <!-- COLUMN 3: COMPLETED -->
+      <div class="kanban-column">
+        <div class="column-header">
+          <h3>Completed</h3>
+          <span class="count">{{ completedTasks().length }}</span>
+        </div>
+        <div
+          cdkDropList
+          [cdkDropListData]="completedTasks()"
+          (cdkDropListDropped)="onDrop($event, 'Completed')"
+          class="card-drop-zone">
+          @for (task of completedTasks(); track task.id) {
+            <div class="kanban-card completed" cdkDrag [cdkDragData]="task">
+              <div class="card-top">
+                <span class="badge priority-{{ task.priority.toLowerCase() }}">{{ task.priority }}</span>
+                <button class="btn-icon" (click)="deleteTask(task.id)">✕</button>
+              </div>
+              <h4>{{ task.title }}</h4>
+              @if (task.description) {
+                <p class="desc">{{ task.description }}</p>
+              }
+            </div>
+          }
+        </div>
+      </div>
+
+    </div>
+  }
+
+  <!-- Task Creation Modal Dialog -->
+  @if (showModal()) {
+    <div class="modal-backdrop" (click)="showModal.set(false)">
+      <div class="modal-window" (click)="$event.stopPropagation()">
+        <h3>Create New Task</h3>
+        <form [formGroup]="createTaskForm" (ngSubmit)="submitCreate()">
+          <div class="form-group">
+            <label for="title">Title</label>
+            <input id="title" type="text" formControlName="title" placeholder="e.g., Setup auth interceptor" />
+          </div>
+
+          <div class="form-group">
+            <label for="description">Description</label>
+            <textarea id="description" rows="3" formControlName="description"></textarea>
+          </div>
+
+          <div class="form-group">
+            <label for="priority">Priority</label>
+            <select id="priority" formControlName="priority">
+              <option value="Low">Low</option>
+              <option value="Medium">Medium</option>
+              <option value="High">High</option>
+            </select>
+          </div>
+
+          <div class="modal-actions">
+            <button type="button" class="btn-secondary" (click)="showModal.set(false)">Cancel</button>
+            <button type="submit" class="btn-primary" [disabled]="createTaskForm.invalid">Create Task</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  }
+</div>

@@ -1,6 +1,27 @@
 export type TaskStatus = 'Todo' | 'InProgress' | 'Completed';
 export type TaskPriority = 'Low' | 'Medium' | 'High';
 
+export interface TaskItemDto {
+  id: string;
+  projectId: string;
+  title: string;
+  description?: string;
+  status: TaskStatus;
+  priority: TaskPriority;
+  dueDateUtc?: string;
+  createdAtUtc: string;
+}
+export interface CreateTaskDto {
+  title: string;
+  description?: string;
+  priority: TaskPriority;
+  dueDateUtc?: string;
+  tagIds?: string[];
+}
+
+export interface UpdateTaskStatusDto {
+  status: TaskStatus;
+}
 export interface UserDto {
   id: string;
   fullName: string;

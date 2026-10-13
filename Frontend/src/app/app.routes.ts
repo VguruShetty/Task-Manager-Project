@@ -16,10 +16,22 @@ export const routes: Routes = [
   {
     path: 'projects',
     canActivate: [authGuard],
-    loadComponent: () =>
-      import('./features/projects/projects-dashboard/projects-dashboard.component').then(
-        m => m.ProjectsDashboardComponent
-      )
+    children: [
+      {
+        path: '',
+        loadComponent: () =>
+          import('./features/projects/projects-dashboard/projects-dashboard.component').then(
+            m => m.ProjectsDashboardComponent
+          )
+      },
+      {
+        path: ':id',
+        loadComponent: () =>
+          import('./features/projects/project-detail/project-detail.component').then(
+            m => m.ProjectDetailComponent
+          )
+      }
+    ]
   },
   { path: '**', redirectTo: 'projects' }
 ];

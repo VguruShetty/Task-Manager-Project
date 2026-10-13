@@ -1494,23 +1494,21 @@
       },
       "TaskItemStatus": {
         "enum": [
-          0,
-          1,
-          2,
-          3
+          "Todo",
+          "InProgress",
+          "InReview",
+          "Completed"
         ],
-        "type": "integer",
-        "format": "int32"
+        "type": "string"
       },
       "TaskPriority": {
         "enum": [
-          1,
-          2,
-          3,
-          4
+          "Low",
+          "Medium",
+          "High",
+          "Urgent"
         ],
-        "type": "integer",
-        "format": "int32"
+        "type": "string"
       },
       "UpdateProjectDto": {
         "type": "object",

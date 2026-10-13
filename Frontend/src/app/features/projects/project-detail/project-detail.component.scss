@@ -1,0 +1,219 @@
+.board-container {
+  max-width: 1200px;
+  margin: 2rem auto;
+  padding: 0 1.5rem;
+
+  .header-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-bottom: 1.5rem;
+
+    .back-link {
+      color: #64748b;
+      text-decoration: none;
+      font-size: 0.875rem;
+      margin-bottom: 0.25rem;
+      display: inline-block;
+      &:hover { color: #2563eb; }
+    }
+
+    h2 { margin: 0; font-size: 1.5rem; color: #0f172a; }
+  }
+
+  .error-banner {
+    background: #fef2f2;
+    border: 1px solid #fecaca;
+    color: #b91c1c;
+    padding: 0.75rem 1rem;
+    border-radius: 6px;
+    margin-bottom: 1rem;
+    font-size: 0.875rem;
+  }
+
+  .kanban-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem;
+    align-items: flex-start;
+  }
+
+  .kanban-column {
+    background: #f1f5f9;
+    border-radius: 10px;
+    padding: 1rem;
+    border: 1px solid #e2e8f0;
+
+    .column-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1rem;
+
+      h3 {
+        margin: 0;
+        font-size: 1rem;
+        font-weight: 600;
+        color: #334155;
+      }
+
+      .count {
+        background: #e2e8f0;
+        color: #475569;
+        font-size: 0.75rem;
+        padding: 0.15rem 0.5rem;
+        border-radius: 12px;
+        font-weight: 600;
+      }
+    }
+
+    .card-drop-zone {
+      min-height: 250px;
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+  }
+
+  .kanban-card {
+    background: #ffffff;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    padding: 1rem;
+    cursor: grab;
+    user-select: none;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    transition: box-shadow 0.2s;
+
+    &:active {
+      cursor: grabbing;
+    }
+
+    &.completed h4 {
+      text-decoration: line-through;
+      color: #94a3b8;
+    }
+
+    .card-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 0.5rem;
+    }
+
+    h4 {
+      margin: 0 0 0.25rem;
+      font-size: 0.95rem;
+      color: #1e293b;
+    }
+
+    .desc {
+      margin: 0;
+      font-size: 0.8rem;
+      color: #64748b;
+      line-height: 1.35;
+    }
+
+    .btn-icon {
+      background: none;
+      border: none;
+      color: #94a3b8;
+      cursor: pointer;
+      font-size: 0.85rem;
+      padding: 0;
+      &:hover { color: #ef4444; }
+    }
+  }
+
+  .badge {
+    font-size: 0.7rem;
+    padding: 0.2rem 0.45rem;
+    border-radius: 4px;
+    font-weight: 600;
+    text-transform: uppercase;
+
+    &.priority-high { background: #fee2e2; color: #b91c1c; }
+    &.priority-medium { background: #fef3c7; color: #d97706; }
+    &.priority-low { background: #e0f2fe; color: #0284c7; }
+  }
+
+  /* CDK Drag-and-Drop animation styles */
+  .cdk-drag-preview {
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+    border-radius: 8px;
+    background: #ffffff;
+    padding: 1rem;
+    border: 1px solid #94a3b8;
+  }
+
+  .cdk-drag-placeholder {
+    opacity: 0.2;
+    border: 2px dashed #94a3b8;
+    background: transparent;
+  }
+
+  .cdk-drag-animating {
+    transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
+  }
+
+  .card-drop-zone.cdk-drop-list-dragging .kanban-card:not(.cdk-drag-placeholder) {
+    transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
+  }
+
+  /* Modal Dialog */
+  .modal-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.4);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 50;
+
+    .modal-window {
+      background: white;
+      padding: 2rem;
+      border-radius: 8px;
+      width: 100%;
+      max-width: 440px;
+
+      h3 { margin: 0 0 1.25rem; }
+      .form-group {
+        margin-bottom: 1rem;
+        label { display: block; margin-bottom: 0.3rem; font-weight: 500; font-size: 0.875rem; }
+        input, textarea, select {
+          width: 100%;
+          padding: 0.55rem;
+          border: 1px solid #cbd5e1;
+          border-radius: 6px;
+          box-sizing: border-box;
+        }
+      }
+      .modal-actions {
+        display: flex;
+        justify-content: flex-end;
+        gap: 0.75rem;
+        margin-top: 1.5rem;
+      }
+    }
+  }
+
+  .btn-primary {
+    background: #2563eb;
+    color: white;
+    border: none;
+    padding: 0.6rem 1.2rem;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 500;
+    &:disabled { opacity: 0.6; }
+  }
+
+  .btn-secondary {
+    background: #f1f5f9;
+    border: 1px solid #cbd5e1;
+    padding: 0.6rem 1rem;
+    border-radius: 6px;
+    cursor: pointer;
+  }
+}
