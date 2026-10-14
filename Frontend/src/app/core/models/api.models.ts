@@ -63,3 +63,13 @@ export interface ProjectQueryParameters {
   pageNumber: number;
   pageSize: number;
 }
+
+export interface UpdateTaskItemDto {
+  title: string;
+  description?: string;
+  priority: TaskPriority;
+  status: TaskStatus;
+  dueDateUtc?: string;
+  assignedToUserId?: string;
+  tagIds?: string[];
+}
